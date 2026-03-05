@@ -1,6 +1,7 @@
 from asyncio import gather, sleep
 from html import escape
 from time import time
+from re import match as re_match
 from mimetypes import guess_type
 from contextlib import suppress
 from os import path as ospath
@@ -456,7 +457,12 @@ class TaskListener(TaskConfig):
                 msg += "〶 <b><u>Files List :</u></b>\n"
                 fmsg = ""
                 for index, (link, name) in enumerate(files.items(), start=1):
-                    chat_id, msg_id = link.split("/")[-2:]
+                    match = re_match(r"https?://t\.me/(?:c/)?([^/]+)/.*?(\d+)$", link)
+                    if match:
+                        chat_id, msg_id = match.groups()
+                    else:
+                        chat_id, msg_id = link.split("/")[-2:]
+
                     fmsg += f"{index}. <a href='{link}'>{name}</a>"
                     if Config.MEDIA_STORE and (
                         self.is_super_chat or Config.LEECH_DUMP_CHAT
